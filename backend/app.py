@@ -8,12 +8,27 @@ from datetime import datetime, timedelta
 from google.oauth2 import service_account
 from google.cloud import storage
 import warnings
+import os
+import json
 
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
+# Function to save credentials from environment variable to a file
+def save_credentials_from_env():
+    json_key = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    if not json_key:
+        raise ValueError("Google credentials are not set in the environment variables.")
+
+    credentials_path = "/tmp/google-credentials.json"
+    with open(credentials_path, "w") as f:
+        f.write(json_key)
+
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
+
 # Load credentials for Google Cloud Storage
+save_credentials_from_env()
 credentials = service_account.Credentials.from_service_account_file(
-    r"C:\Users\Kuwul\Documents\Personal\Projects\React\principal-lane-436113-h7-d598f11aa3a4.json"
+    os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 )
 client = storage.Client(credentials=credentials)
 
